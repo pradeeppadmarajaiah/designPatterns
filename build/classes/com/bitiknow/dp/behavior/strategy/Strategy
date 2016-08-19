@@ -1,0 +1,34 @@
+This is a behavior pattern.
+Algorithm can be changed are selected at run time without modifying the class .
+New algorithm are added without modifying present algorithm or Context.
+
+
+This pattern consists
+	List of algorithm (Strategy)
+	Context to change the algorithm
+	
+Steps to create Strategy Pattern
+	Create a OrderStrategy interface
+	Implement multiple strategy algorithm
+	Create a Context that execute required strategy at runtime
+	
+Real time Example
+Collections.Sort
+Exporting, Sorting , Storing 
+
+In JDK
+-java.util.Comparator#compare()
+-javax.servlet.http.HttpServlet
+-javax.servlet.Filter#doFilter()
+
+	
+For example, You can select OrderExportDetailsByPdf or OrderExportDetailsByText or OrderExportDetailsByDocument strategy at run time based on the Order Context.
+
+State design pattern is used to define and manage state of object, while Strategy pattern is used to define a set of interchangeable algorithm and let's client to choose one of them.
+
+ 
+
+
+	
+
+

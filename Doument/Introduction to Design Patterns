@@ -1,0 +1,47 @@
+http://www.geeksforgeeks.org/design-patterns-set-1-introduction/
+https://sourcemaking.com/
+http://www.javacodegeeks.com/2015/09/introduction-to-design-patterns.html
+
+Design pattern is a general reusable solution or template to a commonly occurring problem in software design. 
+The patterns typically show relationships and interactions between classes or objects. 
+The idea is to speed up the development process by providing tested, proven development paradigm.
+
+
+Goal: 
+•	Understand the problem and matching it with some pattern.
+•	Reusage of old interface or making the present design reusable for the future usage.
+
+Example : 
+For example, there can be only one active Chief Minister of state at a time regardless of personal identity. This pattern is called Singleton pattern.
+Other software examples could be a single DB connection shared by multiple objects as creating a separate DB connection for every object may be costly. 
+
+
+
+Types of Design Patterns
+	Creational
+	Structural
+	Behavioral
+	
+	Creational
+		These design patterns are all about class instantiation or object creation.
+		Abstract Factory, Builder, Factory Method, Prototype, Singleton
+	
+	Structural
+		These design patterns are about organizing different classes and objects to form larger structures and provide new functionality.
+		Adapter, Bridge, Composite, Decorator, Façade, ,Flyweight ,Proxy
+	
+	Behavioral
+		Behavioral patterns are about identifying common communication patterns between objects and realize these patterns.
+		Chain of Responsibility, Command, Interpreter, Iterator, Mediator, Memento, Observer, State, Strategy, Template Method, Visitor
+		
+		
+Problem
+	There are too many instances of a class which represent only a single thing, the value in the properties of the objects are same, and 
+	they are only used as read-only: you can select the Singleton pattern for this design problem which ensures only a single instance for the entire application.
+	 It also helps to decrease the memory size.
+
+	Classes are too much dependent on each other. A Change in one class affects all other dependent classes: 
+	you can use Bridge, Mediator, or Command to solve this design problem.
+	
+	There are two different incompatible interfaces in two different parts of the code, and your need is to convert one interface into another which is used by the client code
+	to make the entire code work: the Adapter pattern fits into this problem.

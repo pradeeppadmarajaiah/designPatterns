@@ -1,0 +1,131 @@
+http://www.journaldev.com/1061/java-synchronization-and-thread-safety-tutorial-with-examples
+http://javatechig.com/design-patterns/singleton-design-pattern-in-java
+
+The Singleton Pattern ensures that a class has only one instance,  and provides a global point of access to it.
+	
+Type of Single Ton Pattern
+	Eager initialization
+	In eager initialization, the instance of Singleton Class is created at the time of class loading, 
+	This is the easiest method to create a singleton class but it has a drawback.
+	The one problem with this approach is that, the object would get created as soon as the class gets loaded into the JVM.
+	
+	Lazy initialization
+	Lazy initialization method to implement Singleton pattern creates the instance in the global access method. 
+	Works fine, in case of single threaded environment.cause issues if multiple threads are inside the if loop at the same time. 
+	It will destroy the singleton pattern and both threads will get the different instances of singleton class
+		
+	Thread Safe Singleton
+		The easier way to create a thread-safe singleton class is to make the global access method synchronized,
+		so that only one thread can execute this method at a time.
+		It reduces the performance because of cost associated with the synchronized method,
+		although we need it only for the first few threads who might create the separate instances.
+		You need to bear cost of synchronization all the time you call this method,
+		while synchronization is only needed on first class, when Singleton instance is created. 	
+		
+	NOTE : 	
+		When a method is synchronized, it locks the Object, if method is static it locks the Class, so it’s always best practice to use
+		synchronized block to lock the only sections of method that needs synchronization.
+		While creating synchronized block, we need to provide the resource on which lock will be acquired,
+		it can be XYZ.class or any Object field of the class.
+		synchronized(this) will lock the Object before entering into the synchronized block.
+		
+	Double checked locking 
+		The synchronized block is used inside the if condition, with an additional check to ensure that only one instance of singleton class is created.
+		On surface this method looks perfect, as you only need to pay price for synchronized block one time, 
+		but it still broken, until you make instance variable volatile.
+		
+		The issue of the failure of double-checked locking is not due to implementation bugs in JVMs but to the current Java platform memory model. 
+		The memory model allows what is known as "out-of-order writes" and is a prime reason why this idiom fails.
+		
+		The volatile keyword now ensures that multiple threads handle the singleton instance correctly. 
+		The volatile prevents memory writes from being re-ordered, making it impossible for other threads to read uninitialized fields of your singleton through 
+		the singleton's pointer.
+
+		Consider this situation: 
+		Thread A discovers that uniqueInstance == null, locks, confirms that it's still null, and calls singleton's constructor. 
+		The constructor makes a write into member XYZ inside Singleton, and returns. 
+		Thread A now writes the reference to the newly created singleton into uniqueInstance, and gets ready to release its lock.
+		Just as thread A gets ready to release its lock, thread B comes along, and discovers that uniqueInstance is not null. 
+		Thread B accesses uniqueInstance.XYZ thinking that it has been initialized, but because the CPU has reordered writes, 
+		the data that thread A has written into XYZ has not been made visible to thread B. Therefore, thread B sees an incorrect value inside XYZ, which is wrong.
+		When you mark uniqueInstance volatile, a memory barrier is inserted. 
+		All writes initiated prior to that of uniqueInstance will be completed before the uniqueInstance is modified, preventing the reordering situation described above.
+		
+		
+		If we do not make the _instance variable volatile than the Thread which is creating instance of Singleton is not able to communicate other thread,
+		 that instance has been created until it comes out of the Singleton block, so if Thread A is creating Singleton instance and just after creation lost the CPU, 
+		 all other thread will not be able to see value of _instance as not null and they will believe its still null.
+		 Why? because reader threads are not doing any locking and until writer thread comes out of synchronized block, memory will not be synchronized 
+		 and value of _instance will not be updated in main memory.
+		 With Volatile keyword in Java this is handled by Java himself and such updates will be visible by all reader threads.
+
+
+
+
+		
+	Bill Pugh solution (Initialization on Demand Holder)
+		The implementation of the idiom relies on the initialization phase of execution within the Java Virtual Machine (JVM) as specified by the Java Language Specification (JLS).[2] 
+		When the class BillPughSingleTon is loaded by the JVM, the class goes through initialization. Since the class does not have any static variables to initialize,
+		the initialization completes trivially. The static class definition BillPughSingleTonHolder within it is not initialized until the JVM determines that LazyHolder must be executed. 
+		The static class BillPughSingleTonholder is only executed when the static method getInstance is invoked on the class BillPughSingleTon,
+		and the first time this happens the JVM will load and initialize the BillPughSingleTonHolder class. The initialization of the BillPughSingleTonHolder class results in static
+		 variable INSTANCE being initialized by executing the (private) constructor for the outer class BillPughSingleTon.
+		 Since the class initialization phase is guaranteed by the JLS to be serial, i.e., non-concurrent, no further synchronization is required in the static getInstance method
+		  during loading and initialization. And since the initialization phase writes the static variable INSTANCE in a serial operation,
+		all subsequent concurrent invocations of the getInstance will return the same correctly initialized INSTANCE without incurring any additional synchronization overhead.
+		
+		Using Reflection to destroy Singleton Pattern : Reflection can be used to destroy all the above singleton implementation approaches.
+		When you run the above test class, you will notice that hashCode of both the instances are not same that destroys the singleton pattern. 
+		Reflection is very powerful and used in a lot of frameworks like Spring and Hibernate.
+		
+		
+		
+	
+	Enum Singleton
+	To overcome this situation with Reflection, Joshua Bloch suggests the use of Enum to implement Singleton design pattern as Java ensures that any enum value is instantiated only once in a Java program.
+	Since Java Enum values are globally accessible, so is the singleton. 
+	Serialization for free.
+    Guaranteed one instance (Cannot instantiate more then one enum even through reflection.)
+    Thread safe
+	The drawback is that the enum type is somewhat inflexible; for example, it does not allow lazy initialization.
+	
+	
+	
+	Adding readResolve() To Single Ton :
+	So, till now you must have taken your decision that how you would like to implement your singleton. Now lets see other problems that may arise even in interviews also.
+	Lets say your application is distributed and it frequently serialize the objects in file system, only to read them later when required. 
+	Please note that, de-serialization always creates a new instance.
+	Lets understand using an example:
+	Lets serialize this class and de-serialize it after making some changes.
+	Unfortunately, both variables have different value of variable “i”. Clearly, there are two instances of our class. So, again we are in same problem of multiple instances in application.
+	
+	To solve this issue, we need to include readResolve() method in our DemoSingleton class. This method will be invoked when you will de-serialize the object. 
+	Inside this method, you must return the existing instance to ensure single instance application wide.
+	
+	Adding serial version id : 
+	So far so good. Till now, we have solved the problem of synchronization and serialization both. 
+	Now, we are just one step behind our correct and complete implementation. And missing part is serial version id.
+
+	This is required in condition when your class structure can change in between you serialize the instance and go again to de-serialize it. 
+	Changed structure of class will cause JVM to give exception while de-serializing process.
+
+	
+		
+
+	
+How to create a class using the Singleton Pattern
+	Step 1: Provide a default Private constructor
+	Step 2: Create a Method for getting the reference to the Singleton Object
+	Step 3: Make the Access method Synchronized to prevent Thread Problems : It could happen that the access method may be called twice from 2 different classes at the same time and hence more than one object being created.
+	
+	
+	Examples in JAva :
+		Java.lang.Runtime with getRuntime() method 
+		Java.awt.Toolkit with getDefaultToolkit() 
+		Java.awt.Desktop with getDesktop() 
+
+
+
+	
+	
+	
